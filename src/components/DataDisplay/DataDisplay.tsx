@@ -1,20 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 // import { serverCalls } from "../../api";
 import { useFetchData } from "../../hooks";
 import { SheetForm } from "../SheetForm";
-import { Link, useLocation } from "react-router-dom";
-import {
-  DataGridPremium,
-  GridToolbar,
-  useGridApiRef,
-  useKeepGroupedColumnsHidden,
-} from "@mui/x-data-grid-premium";
-
-interface displayData {
-  data: {
-    id?: string;
-  };
-}
+import { Link } from "react-router-dom";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 
 export const DataDisplay = () => {
   const { sheetData, getData } = useFetchData();
@@ -30,7 +19,23 @@ export const DataDisplay = () => {
         </div>
       );
     } else {
-      return <div className="flex"></div>;
+      const columns = Object.keys(sheetData[0]).map((field) => ({
+        field,
+        headerName: field,
+        width: 150,
+      }));
+      return (
+        <div style={{ height: 400, width: '100%' }}>
+          <DataGrid
+            rows={sheetData.map((data: any, index: string) => ({ id: index, ...data }))}
+            columns={columns}
+            components={{
+              Toolbar: GridToolbar,
+            }}
+            density="compact"
+          />
+        </div>
+      );
     }
   } else {
     return (

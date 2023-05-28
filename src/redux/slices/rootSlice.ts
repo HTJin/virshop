@@ -8,6 +8,7 @@ interface PullSheetState {
   rarity: number;
   quantity: boolean;
   file_name: string;
+  csv_data: any[];
 }
 
 const initialState: PullSheetState = {
@@ -18,6 +19,7 @@ const initialState: PullSheetState = {
   rarity: 0,
   quantity: false,
   file_name: "",
+  csv_data: [],
 };
 
 const rootSlice = createSlice({
@@ -45,6 +47,9 @@ const rootSlice = createSlice({
     getFileName: (state, action) => {
       state.file_name = action.payload;
     },
+    getCsvData: (state, action) => {
+      state.csv_data = action.payload;
+    },
   },
 });
 
@@ -57,4 +62,5 @@ export const {
   getRarity,
   getQuantity,
   getFileName,
+  getCsvData,
 } = rootSlice.actions;

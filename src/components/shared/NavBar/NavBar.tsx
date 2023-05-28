@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Divider, Stack } from "@mui/material";
 import { getAuth, signOut } from "firebase/auth";
-import logo from "../../../static/images/V.png"
+import logo from "../../../static/images/V.png";
 
 export const NavBar = () => {
   const navigate = useNavigate();
@@ -11,7 +11,7 @@ export const NavBar = () => {
   const logOut = async () => {
     await signOut(auth);
     localStorage.setItem("myAuth", "false");
-    navigate("/")
+    navigate("/");
   };
   const myAuth = localStorage.getItem("myAuth");
   return (
@@ -19,11 +19,11 @@ export const NavBar = () => {
       className={`fixed top-0 z-10 flex w-[100vw] items-center justify-between bg-gradient-to-t from-emerald-900 to-slate-950 px-0 py-[.5em] shadow-xl shadow-teal-500/70`}
     >
       <h1 className="ml-[.5em] text-[1.5em] uppercase">
-        <Link className="list-none font-bruno no-underline" to="/">
+        <Link className="font-bruno list-none no-underline" to="/">
           <img src={logo} alt="Logo" className="h-8 w-8" />
         </Link>
       </h1>
-      <ul className="mr-[8em] flex w-full list-none justify-center no-underline">
+      <ul className="absolute mx-auto flex w-full list-none justify-center no-underline">
         <Stack
           direction="row"
           divider={
