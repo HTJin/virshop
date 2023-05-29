@@ -2,9 +2,10 @@ const token = `${process.env.REACT_APP_USER_TOKEN}`;
 const fireToken = localStorage.getItem("user_token");
 
 export const serverCalls = {
-  get: async () => {
+  get: async (fileName: string) => {
+    console.log(`Fetching transformed data for ${fileName}`);
     const response = await fetch(
-      `https://virshop-server.glitch.me/api/upload/${fireToken}`,
+      `https://virshop-server.glitch.me/api/transform/${fireToken}/${fileName}`,
       {
         method: "GET",
         headers: {
@@ -18,52 +19,23 @@ export const serverCalls = {
     }
     return await response.json();
   },
-  create: async (data: any = {}) => {
+  upload: async (file: any, fileName: string) => {
+    console.log(`Uploading ${fileName}`);
+    const formData = new FormData();
+    formData.append("csv", file);
     const response = await fetch(
-      `https://virshop-server.glitch.me/api/upload/${fireToken}`,
+      `https://virshop-server.glitch.me/api/upload/${fireToken}/${fileName}`,
       {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
           "x-access-token": `Bearer ${token}`,
         },
-        body: JSON.stringify(data),
+        body: formData,
       }
     );
     if (!response.ok) {
-      throw new Error("Failed to create new data on server");
+      throw new Error("Failed to upload file to server");
     }
     return await response.json();
-  },
-  update: async (file_name: string, data: any = {}) => {
-    const response = await fetch(
-      `https://virshop-server.glitch.me/api/upload/${file_name}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "x-access-token": `Bearer ${token}`,
-        },
-        body: JSON.stringify(data),
-      }
-    );
-    if (!response.ok) {
-      throw new Error("Failed to update data on server");
-    }
-  },
-  delete: async (file_name: string) => {
-    const response = await fetch(
-      `https://virshop-server.glitch.me/api/upload/${file_name}/remove`,
-      {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          "x-access-token": `Bearer ${token}`,
-        },
-      }
-    );
-    if (!response.ok) {
-      throw new Error(`Failed to delete pull sheet: ${file_name}`);
-    }
   },
 };

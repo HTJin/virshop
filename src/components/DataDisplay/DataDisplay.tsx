@@ -1,21 +1,41 @@
 import { useState } from "react";
-// import { serverCalls } from "../../api";
 import { useFetchData } from "../../hooks";
 import { SheetForm } from "../SheetForm";
 import { Link } from "react-router-dom";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import { CircularProgress } from "@mui/material";
+import Papa from "papaparse";
 
 export const DataDisplay = () => {
   const { sheetData, getData } = useFetchData();
-  const [fileName, setFileName] = useState("No Pull Sheet Detected")
+  const [fileName, setFileName] = useState("No Pull Sheet Detected");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleFileSelected = async (fileName: string) => {
+    setIsLoading(true);
+    setFileName(fileName);
+    const data = await getData(fileName);
+    const csv = Papa.unparse(data);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "export.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setIsLoading(false);
+  };
 
   const myAuth = localStorage.getItem("myAuth");
   if (myAuth === "true") {
-    if (sheetData.length === 0) {
+    if (isLoading) {
+      return <CircularProgress />;
+    } else if (sheetData === null || sheetData.length === 0) {
       return (
         <div className="flex select-none flex-col items-center rounded-3xl border-4 border-dashed border-indigo-500 px-[10vw] py-[10vh]">
           <h3 className="mb-8 text-sm font-semibold">{fileName}</h3>
-          <SheetForm onFileSelected={setFileName} />
+          <SheetForm onFileSelected={handleFileSelected} />
         </div>
       );
     } else {
@@ -25,9 +45,12 @@ export const DataDisplay = () => {
         width: 150,
       }));
       return (
-        <div style={{ height: 400, width: '100%' }}>
+        <div style={{ height: 400, width: "100%" }}>
           <DataGrid
-            rows={sheetData.map((data: any, index: string) => ({ id: index, ...data }))}
+            rows={sheetData.map((data: any, index: string) => ({
+              id: index,
+              ...data,
+            }))}
             columns={columns}
             components={{
               Toolbar: GridToolbar,
