@@ -1,21 +1,31 @@
 import { useState } from "react";
-import { useFetchData } from "../../hooks";
 import { SheetForm } from "../SheetForm";
 import { Link } from "react-router-dom";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Button } from "@mui/material";
 import Papa from "papaparse";
 
 export const DataDisplay = () => {
-  const { sheetData, getData } = useFetchData();
+  const [sheetData, setSheetData] = useState<any[]>([]);
   const [fileName, setFileName] = useState("No Pull Sheet Detected");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleFileSelected = async (fileName: string) => {
+  const handleFileSelected = (fileName: string, file: File) => {
     setIsLoading(true);
     setFileName(fileName);
-    const data = await getData(fileName);
-    const csv = Papa.unparse(data);
+    Papa.parse(file, {
+      header: true,
+      dynamicTyping: true,
+      complete: (results) => {
+        setSheetData(results.data);
+        setIsLoading(false);
+      },
+    });
+  };
+
+  const handleExport = () => {
+    setIsLoading(true);
+    const csv = Papa.unparse(sheetData);
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -31,32 +41,37 @@ export const DataDisplay = () => {
   if (myAuth === "true") {
     if (isLoading) {
       return <CircularProgress />;
-    } else if (sheetData === null || sheetData.length === 0) {
-      return (
-        <div className="flex select-none flex-col items-center rounded-3xl border-4 border-dashed border-indigo-500 px-[10vw] py-[10vh]">
-          <h3 className="mb-8 text-sm font-semibold">{fileName}</h3>
-          <SheetForm onFileSelected={handleFileSelected} />
-        </div>
-      );
     } else {
-      const columns = Object.keys(sheetData[0]).map((field) => ({
-        field,
-        headerName: field,
-        width: 150,
-      }));
+      const columns =
+        sheetData && sheetData.length > 0
+          ? Object.keys(sheetData[0]).map((field) => ({
+              field,
+              headerName: field,
+              width: 150,
+            }))
+          : [];
       return (
-        <div style={{ height: 400, width: "100%" }}>
-          <DataGrid
-            rows={sheetData.map((data: any, index: string) => ({
-              id: index,
-              ...data,
-            }))}
-            columns={columns}
-            components={{
-              Toolbar: GridToolbar,
-            }}
-            density="compact"
-          />
+        <div>
+          <div className="flex flex-col items-center">
+            <h3 className="mb-8 text-sm font-semibold">{fileName}</h3>
+            <SheetForm onFileSelected={handleFileSelected} />
+          </div>
+          {sheetData && sheetData.length > 0 && (
+            <div className="flex mt-12 h-[60vh] w-[45vw]">
+              <DataGrid
+                rows={sheetData.map((data: any, index: number) => ({
+                  id: index,
+                  ...data,
+                }))}
+                columns={columns}
+                components={{
+                  Toolbar: GridToolbar,
+                }}
+                density="compact"
+                className="bg-slate-800 animate-gridTrance"
+              />
+            </div>
+          )}
         </div>
       );
     }

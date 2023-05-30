@@ -1,6 +1,5 @@
 import { useState, ChangeEvent } from "react";
 import { useForm } from "react-hook-form";
-import { serverCalls } from "../../api";
 
 interface SheetFormProps {
   onFileSelected: (filename: string, file: File) => void;
@@ -9,25 +8,22 @@ interface SheetFormProps {
 export const SheetForm = ({ onFileSelected }: SheetFormProps) => {
   const { register, handleSubmit } = useForm();
   const [fileSelected, setFileSelected] = useState(false);
-  const [selectedFileName, setSelectedFileName] = useState("");
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       setFileSelected(true);
-      setSelectedFileName(file.name);
       onFileSelected(file.name, file);
     } else {
       setFileSelected(false);
     }
   };
 
-  const onSubmit = async (data: any, event: any) => {
+  const onSubmit = (data: any, event: any) => {
     event.preventDefault();
     if (data.file.length > 0) {
-      const formData = new FormData();
-      formData.append("csv", data.file[0]);
-      await serverCalls.upload(formData, selectedFileName);
+      setFileSelected(true);
+      onFileSelected(data.file[0].name, data.file[0]);
     }
   };
 

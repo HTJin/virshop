@@ -11,6 +11,7 @@ module.exports = {
         trance: "trance 5s linear infinite",
         tranceBg: "tranceBg 5s linear infinite",
         bodyBg: "bodyBg 3s ease-in-out infinite",
+        gridTrance: "gridTrance 5s linear infinite",
         curl: "curl 2s ease-out .5s both",
       },
       keyframes: {
@@ -26,6 +27,10 @@ module.exports = {
           "0%, 100%": { background: "#ffd700" },
           "20%, 80%": { background: "#ffa700" },
           "50%": { background: "#ffff00" },
+        },
+        gridTrance: {
+          "0%, 100%": { color: "rgb(220 252 231)" },
+          "50%": { color: "rgb(134 239 172)" },
         },
         curl: {
           "0%": {
