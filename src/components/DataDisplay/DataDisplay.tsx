@@ -5,6 +5,19 @@ import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { CircularProgress } from "@mui/material";
 import Papa from "papaparse";
 
+interface ParseResult {
+  data: any[];
+  errors: any[];
+  meta: {
+    delimiter: string;
+    linebreak: string;
+    aborted: boolean;
+    fields?: string[];
+    truncated?: boolean;
+    cursor: number;
+  };
+}
+
 export const DataDisplay = () => {
   const [sheetData, setSheetData] = useState<any[]>([]);
   const [fileName, setFileName] = useState("No Pull Sheet Detected");
@@ -18,7 +31,8 @@ export const DataDisplay = () => {
     Papa.parse(file, {
       header: true,
       dynamicTyping: true,
-      complete: (results) => {
+      complete: (results: ParseResult) => {
+        results.data.pop();
         const transformedData = results.data
           .slice(0, -1)
           .map((row: any) => ({
