@@ -2,39 +2,46 @@ import { useState } from "react";
 import { SheetForm } from "../SheetForm";
 import { Link } from "react-router-dom";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import { CircularProgress, Button } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 import Papa from "papaparse";
 
 export const DataDisplay = () => {
   const [sheetData, setSheetData] = useState<any[]>([]);
   const [fileName, setFileName] = useState("No Pull Sheet Detected");
+  const [fileSelected, setFileSelected] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleFileSelected = (fileName: string, file: File) => {
     setIsLoading(true);
     setFileName(fileName);
+    setFileSelected(true);
     Papa.parse(file, {
       header: true,
       dynamicTyping: true,
       complete: (results) => {
-        setSheetData(results.data);
+        const transformedData = results.data
+          .slice(0, -1)
+          .map((row: any) => ({
+            R: row.Rarity,
+            Q: row.Quantity,
+            "Product Name": row["Product Name"],
+            Set: row.Set,
+            Number: row.Number,
+          }))
+          .sort((a: any, b: any) => {
+            if (a["Set"] === b["Set"]) {
+              if (a["R"] === b["R"]) {
+                return a["Product Name"] < b["Product Name"] ? -1 : 1;
+              }
+              return a["R"] < b["R"] ? -1 : 1;
+            }
+            return a["Set"] < b["Set"] ? -1 : 1;
+          });
+
+        setSheetData(transformedData);
         setIsLoading(false);
       },
     });
-  };
-
-  const handleExport = () => {
-    setIsLoading(true);
-    const csv = Papa.unparse(sheetData);
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "export.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    setIsLoading(false);
   };
 
   const myAuth = localStorage.getItem("myAuth");
@@ -54,10 +61,14 @@ export const DataDisplay = () => {
         <div>
           <div className="flex flex-col items-center">
             <h3 className="mb-8 text-sm font-semibold">{fileName}</h3>
-            <SheetForm onFileSelected={handleFileSelected} />
+            <SheetForm
+              onFileSelected={handleFileSelected}
+              fileSelected={fileSelected}
+              setFileSelected={setFileSelected}
+            />
           </div>
           {sheetData && sheetData.length > 0 && (
-            <div className="flex mt-12 h-[60vh] w-[45vw]">
+            <div className="mt-12 flex h-[60vh] w-[45vw]">
               <DataGrid
                 rows={sheetData.map((data: any, index: number) => ({
                   id: index,
@@ -68,7 +79,7 @@ export const DataDisplay = () => {
                   Toolbar: GridToolbar,
                 }}
                 density="compact"
-                className="bg-slate-800 animate-gridTrance"
+                className="animate-gridTrance bg-slate-800"
               />
             </div>
           )}

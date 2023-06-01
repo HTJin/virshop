@@ -1,13 +1,14 @@
-import { useState, ChangeEvent } from "react";
+import { ChangeEvent } from "react";
 import { useForm } from "react-hook-form";
 
 interface SheetFormProps {
   onFileSelected: (filename: string, file: File) => void;
+  fileSelected: boolean;
+  setFileSelected: (selected: boolean) => void;
 }
 
-export const SheetForm = ({ onFileSelected }: SheetFormProps) => {
+export const SheetForm = ({ onFileSelected, fileSelected, setFileSelected }: SheetFormProps) => {
   const { register, handleSubmit } = useForm();
-  const [fileSelected, setFileSelected] = useState(false);
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
