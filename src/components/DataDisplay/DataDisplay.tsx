@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { SheetForm } from "../SheetForm";
 import { Link } from "react-router-dom";
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import { DataGrid, GridToolbar, GridToolbarContainer } from "@mui/x-data-grid";
 import { CircularProgress } from "@mui/material";
 import Papa from "papaparse";
 
@@ -17,6 +17,18 @@ interface ParseResult {
     cursor: number;
   };
 }
+
+interface CustomToolbarProps {
+  fileName: string;
+}
+
+const CustomToolbar = ({ fileName }: CustomToolbarProps) => (
+  <div className="flex justify-center">
+    <GridToolbarContainer>
+      <GridToolbar csvOptions={{ fileName }} />
+    </GridToolbarContainer>
+  </div>
+);
 
 export const DataDisplay = () => {
   const [sheetData, setSheetData] = useState<any[]>([]);
@@ -90,10 +102,10 @@ export const DataDisplay = () => {
                 }))}
                 columns={columns}
                 components={{
-                  Toolbar: GridToolbar,
+                  Toolbar: () => <CustomToolbar fileName={`V_${fileName}`} />,
                 }}
                 density="compact"
-                className="animate-gridTrance bg-slate-800"
+                className="animate-gridTrance bg-slate-700"
               />
             </div>
           )}
