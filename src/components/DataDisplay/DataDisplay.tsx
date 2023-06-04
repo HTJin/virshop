@@ -48,6 +48,7 @@ export const DataDisplay = () => {
   const [fileSelected, setFileSelected] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [columnWidths, setColumnWidths] = useState<Record<string, number>>({});
+  const [isInventoryCSV, setIsInventoryCSV] = useState(false);
   const [normalizedWidths, setNormalizedWidths] = useState<
     Record<string, number>
   >({});
@@ -63,6 +64,7 @@ export const DataDisplay = () => {
       complete: (results: ParseResult) => {
         const isPullSheetCSV = results.meta.fields?.[0] === "Product Line";
         const isInventoryCSV = results.meta.fields?.[0] === "TCGplayer Id";
+        setIsInventoryCSV(isInventoryCSV);
         let transformedData: Array<Record<string, string | number>> = [];
         if (isPullSheetCSV) {
           results.data = results.data.filter(
@@ -139,6 +141,11 @@ export const DataDisplay = () => {
           });
           setColumnWidths(adjustedColumnWidths);
         }
+        let correctedFileName = fileName;
+        if (fileName.endsWith(".csv")) {
+          correctedFileName = fileName.substring(0, fileName.length - 4);
+        }
+        setFileName(correctedFileName);
       },
     });
   };
@@ -181,15 +188,20 @@ export const DataDisplay = () => {
       const columns: GridColDef[] =
         sheetData && sheetData.length > 0
           ? Object.keys(sheetData[0]).map((field) => {
-              let width = Math.max(
-                100,
-                normalizedWidths[field],
-                columnWidths[field] * 8
-              );
-              if (field !== "Number") {
-                width = width * 0.75;
+              let width;
+              if (fileName.includes("Inventory")) {
+                width = field.length * 10;
               } else {
-                width = width * 1.25;
+                width = Math.max(
+                  100,
+                  normalizedWidths[field],
+                  columnWidths[field] * 8
+                );
+                if (field !== "Number") {
+                  width = width * 0.75;
+                } else {
+                  width = width * 1.25;
+                }
               }
               return {
                 field,
@@ -224,6 +236,7 @@ export const DataDisplay = () => {
                     />
                   ),
                 }}
+                checkboxSelection={isInventoryCSV}
                 density="compact"
                 className="animate-gridTrance bg-slate-700"
               />
