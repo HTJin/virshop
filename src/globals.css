@@ -14,12 +14,13 @@ html {
   scroll-snap-type: y mandatory;
   overflow-x: hidden;
   user-select: none;
-  background: linear-gradient(238.72deg, #ffb864 0%, #006c4c 100%),
-    radial-gradient(100% 224.43% at 0% 0%, #6cff72 0%, #002c6d 100%),
-    linear-gradient(121.28deg, #ffeab6 0%, #00563c 100%),
-    radial-gradient(56.26% 101.79% at 50% 0%, #8f00ff 0%, #000000 100%),
-    linear-gradient(65.05deg, #6f0072 0%, #dbffe5 100%);
-  background-blend-mode: overlay, screen, color-burn, screen, normal;
+  background: radial-gradient(
+      111% 111% at 74.29% -11%,
+      #a93300 0%,
+      #005570 100%
+    ),
+    linear-gradient(127.43deg, #00d5c8 0%, #2200aa 100%);
+  background-blend-mode: difference, normal;
 }
 
 :root {
