@@ -16,7 +16,7 @@ export const NavBar = () => {
   const myAuth = localStorage.getItem("myAuth");
   return (
     <div
-      className={`fixed top-0 z-10 flex w-[100vw] items-center justify-between bg-gradient-to-t from-emerald-900 to-slate-950 px-0 py-[.5em] shadow-xl shadow-teal-500/70`}
+      className={`fixed top-0 z-10 flex w-[100vw] items-center justify-between bg-gradient-to-t from-teal-900 to-emerald-950 px-0 py-[.5em] shadow-xl shadow-indigo-500/70`}
     >
       <h1 className="ml-[.5em] text-[1.5em] uppercase">
         <Link className="font-bruno list-none no-underline" to="/">
